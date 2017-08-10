@@ -1,9 +1,18 @@
-# play26-swagger-reactivemongo
-An example project with Play Framework 2.6, Swagger and Reactivemongo
+# Play 2.6.2 with Swagger, Swagger-UI and Reactivemongo
+A simple TODO App built with [Play Framework 2.6](https://www.playframework.com/) [Swagger](https://github.com/swagger-api/swagger-play/tree/master/play-2.6/swagger-play2) and [Reactivemongo](http://reactivemongo.org/)
 
-https://www.playframework.com/
+### How to run
+You need
+* MongoDB Installed and running on your machine with a database ```example```. Tutorial [here](https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-ubuntu/)
+* IntelliJ to import the project
 
-https://github.com/swagger-api/swagger-play/tree/master/play-2.6/swagger-play2
 
-http://reactivemongo.org/
+Then open your favourite browser and go to
 
+```localhost:9000/api-docs```
+
+From the beautiful Swagger-UI interface you can perform all the CRUD operations you want
+
+Enjoy.
+
+Author: [Riccardo Sirigu](https://www.riccardosirigu.com/)
