@@ -4,7 +4,7 @@ A simple TODO App built with [Play Framework 2.6](https://www.playframework.com/
 ### How to run
 You need
 * MongoDB Installed and running on your machine with a database ```example```. Tutorial [here](https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-ubuntu/)
-* SBT
+* SBT (mandatory if you don't want to use an IDE)
 * IntelliJ to import the project (optional)
 * SBT plugin (optional)
 
