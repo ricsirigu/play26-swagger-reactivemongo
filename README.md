@@ -5,7 +5,9 @@ A simple TODO App built with [Play Framework 2.6](https://www.playframework.com/
 You need
 * MongoDB Installed and running on your machine with a database ```example```. Tutorial [here](https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-ubuntu/)
 * IntelliJ to import the project
+* SBT plugin (optional)
 
+Once you imported the project, run SBT and type ```run```  to launch the server.
 
 Then open your favourite browser and go to
 
