@@ -42,8 +42,8 @@ class TodoRepository @Inject()(implicit ec: ExecutionContext, reactiveMongoApi: 
     collection.flatMap(_.insert(todo))
   }
 
-  def updateTodo(id: String, todo: Todo): Future[UpdateWriteResult] = {
-    val selector = BSONDocument("_id" -> BSONObjectID.parse(id).get)
+  def updateTodo(id: BSONObjectID, todo: Todo): Future[UpdateWriteResult] = {
+    val selector = BSONDocument("_id" -> id)
     val modifier = BSONDocument(
       "$set" -> BSONDocument(
         "title" -> todo.title,
@@ -52,8 +52,8 @@ class TodoRepository @Inject()(implicit ec: ExecutionContext, reactiveMongoApi: 
     collection.flatMap(_.update(selector, modifier))
   }
 
-  def deleteTodo(id: String): Future[WriteResult] = {
-    val selector = BSONDocument("_id" -> BSONObjectID.parse(id).get)
+  def deleteTodo(id: BSONObjectID): Future[WriteResult] = {
+    val selector = BSONDocument("_id" -> id)
     collection.flatMap(_.remove(selector))
   }
 

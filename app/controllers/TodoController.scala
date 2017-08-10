@@ -7,6 +7,7 @@ import models.JsonFormats._
 import models.{Todo, TodoRepository}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
+import reactivemongo.bson.BSONObjectID
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -53,7 +54,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     )
   )
   def updateTodo(@ApiParam(value = "The id of the Todo to update")
-                 todoId: String) = Action.async(parse.json){ req =>
+                 todoId: BSONObjectID) = Action.async(parse.json){ req =>
     req.body.validate[Todo].map{ todo =>
       todoRepo.updateTodo(todoId, todo).map{ _ =>
         Ok
@@ -65,7 +66,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     value = "Deletes a Todo",
     response = classOf[Void]
   )
-  def deleteTodo(@ApiParam(value = "The id of the Todo to delete") todoId: String) = Action.async{ req =>
+  def deleteTodo(@ApiParam(value = "The id of the Todo to delete") todoId: BSONObjectID) = Action.async{ req =>
     todoRepo.deleteTodo(todoId).map{ _ =>
       Ok
     }
