@@ -14,7 +14,7 @@ class ApiDocsController @Inject()(cc: ControllerComponents, configuration: Confi
   }
 
   def redirectToDocs = Action {
-    val basePath = configuration.underlying.getString("swagger.api.basepath")
+    val basePath = configuration.underlying.getString("swagger.api.uri")
     Redirect(
       url = "/assets/lib/swagger-ui/index.html",
       queryString = Map("url" -> Seq(s"$basePath/swagger.json"))
