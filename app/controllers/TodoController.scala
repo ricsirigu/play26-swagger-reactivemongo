@@ -32,7 +32,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
 
   @ApiOperation(
     value = "Get a Todo",
-    response = classOf[Void]
+    response = classOf[Todo]
   )
   def getTodo(@ApiParam(value = "The id of the Todo to fetch") todoId: BSONObjectID) = Action.async{ req =>
     todoRepo.getTodo(todoId).map{ maybeTodo =>
