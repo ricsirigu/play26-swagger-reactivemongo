@@ -38,6 +38,11 @@ class TodoRepository @Inject()(implicit ec: ExecutionContext, reactiveMongoApi: 
     )
   }
 
+  def getTodo(id: BSONObjectID): Future[Option[Todo]] = {
+    val query = BSONDocument("_id" -> id)
+    collection.flatMap(_.find(query).one[Todo])
+  }
+
   def addTodo(todo: Todo): Future[WriteResult] = {
     collection.flatMap(_.insert(todo))
   }

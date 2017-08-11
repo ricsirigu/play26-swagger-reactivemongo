@@ -29,6 +29,19 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     }
   }
 
+
+  @ApiOperation(
+    value = "Get a Todo",
+    response = classOf[Void]
+  )
+  def getTodo(@ApiParam(value = "The id of the Todo to fetch") todoId: BSONObjectID) = Action.async{ req =>
+    todoRepo.getTodo(todoId).map{ maybeTodo =>
+      maybeTodo.map{ todo =>
+        Ok(Json.toJson(todo))
+      }.getOrElse(NotFound)
+    }
+  }
+
   @ApiOperation(
     value = "Add a new Todo to the list",
     response = classOf[Void]
@@ -46,7 +59,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
   }
 
   @ApiOperation(
-    value = "Updates a Todo",
+    value = "Update a Todo",
     response = classOf[Void]
   )
   @ApiImplicitParams(Array(
@@ -63,7 +76,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
   }
 
   @ApiOperation(
-    value = "Deletes a Todo",
+    value = "Delete a Todo",
     response = classOf[Void]
   )
   def deleteTodo(@ApiParam(value = "The id of the Todo to delete") todoId: BSONObjectID) = Action.async{ req =>

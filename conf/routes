@@ -5,6 +5,7 @@
 # An example controller showing a sample home page
 GET       /                           controllers.ApiDocsController.index
 GET       /todos                      controllers.TodoController.getAllTodos
+GET       /todos/:id                  controllers.TodoController.getTodo(id: reactivemongo.bson.BSONObjectID)
 + nocsrf
 POST      /todos                      controllers.TodoController.createTodo
 + nocsrf
