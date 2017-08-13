@@ -32,7 +32,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
 
   @ApiOperation(
     value = "Get a Todo",
-    response = classOf[Void]
+    response = classOf[Todo]
   )
   @ApiResponses(Array(
       new ApiResponse(code = 404, message = "Todo not found")
