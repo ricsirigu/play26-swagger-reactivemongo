@@ -9,10 +9,6 @@ import play.api.mvc._
   */
 class ApiDocsController @Inject()(cc: ControllerComponents, configuration: Configuration) extends AbstractController(cc) {
 
-  def index = Action {
-    Ok("It works.")
-  }
-
   def redirectToDocs = Action {
     val basePath = configuration.underlying.getString("swagger.api.uri")
     Redirect(

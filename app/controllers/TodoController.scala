@@ -34,6 +34,10 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     value = "Get a Todo",
     response = classOf[Void]
   )
+  @ApiResponses(Array(
+      new ApiResponse(code = 404, message = "Todo not found")
+    )
+  )
   def getTodo(@ApiParam(value = "The id of the Todo to fetch") todoId: BSONObjectID) = Action.async{ req =>
     todoRepo.getTodo(todoId).map{ maybeTodo =>
       maybeTodo.map{ todo =>
@@ -46,6 +50,10 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     value = "Add a new Todo to the list",
     response = classOf[Void]
   )
+  @ApiResponses(Array(
+      new ApiResponse(code = 400, message = "Invalid Todo format")
+    )
+  )
   @ApiImplicitParams(Array(
       new ApiImplicitParam(value = "The Todo to add, in Json Format", required = true, dataType = "models.Todo", paramType = "body")
     )
@@ -55,12 +63,16 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
       todoRepo.addTodo(todo).map{ _ =>
         Created
       }
-    }.getOrElse(Future.successful(BadRequest("Invalid Json")))
+    }.getOrElse(Future.successful(BadRequest("Invalid Todo format")))
   }
 
   @ApiOperation(
     value = "Update a Todo",
     response = classOf[Void]
+  )
+  @ApiResponses(Array(
+      new ApiResponse(code = 400, message = "Invalid Todo format")
+    )
   )
   @ApiImplicitParams(Array(
       new ApiImplicitParam(value = "The updated Todo, in Json Format", required = true, dataType = "models.Todo", paramType = "body")

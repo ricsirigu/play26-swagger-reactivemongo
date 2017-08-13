@@ -2,8 +2,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# An example controller showing a sample home page
-GET       /                           controllers.ApiDocsController.index
 GET       /todos                      controllers.TodoController.getAllTodos
 GET       /todos/:id                  controllers.TodoController.getTodo(id: reactivemongo.bson.BSONObjectID)
 + nocsrf
@@ -14,6 +12,7 @@ PATCH     /todos/:id                  controllers.TodoController.updateTodo(id: 
 DELETE    /todos/:id                  controllers.TodoController.deleteTodo(id: reactivemongo.bson.BSONObjectID)
 
 # Swagger docs
+GET       /                           controllers.ApiDocsController.redirectToDocs
 GET       /swagger.json               controllers.ApiHelpController.getResources
 GET       /api-docs                   controllers.ApiDocsController.redirectToDocs
 
