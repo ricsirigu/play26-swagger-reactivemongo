@@ -68,7 +68,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
 
   @ApiOperation(
     value = "Update a Todo",
-    response = classOf[Void]
+    response = classOf[Todo]
   )
   @ApiResponses(Array(
       new ApiResponse(code = 400, message = "Invalid Todo format")
@@ -81,19 +81,21 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
   def updateTodo(@ApiParam(value = "The id of the Todo to update")
                  todoId: BSONObjectID) = Action.async(parse.json){ req =>
     req.body.validate[Todo].map{ todo =>
-      todoRepo.updateTodo(todoId, todo).map{ _ =>
-        Ok
+      todoRepo.updateTodo(todoId, todo).map {
+        case Some(todo) => Ok(Json.toJson(todo))
+        case None => NotFound
       }
     }.getOrElse(Future.successful(BadRequest("Invalid Json")))
   }
 
   @ApiOperation(
     value = "Delete a Todo",
-    response = classOf[Void]
+    response = classOf[Todo]
   )
   def deleteTodo(@ApiParam(value = "The id of the Todo to delete") todoId: BSONObjectID) = Action.async{ req =>
-    todoRepo.deleteTodo(todoId).map{ _ =>
-      Ok
+    todoRepo.deleteTodo(todoId).map {
+      case Some(todo) => Ok(Json.toJson(todo))
+      case None => NotFound
     }
   }
 

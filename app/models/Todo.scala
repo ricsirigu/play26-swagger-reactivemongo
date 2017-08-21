@@ -28,11 +28,11 @@ class TodoRepository @Inject()(implicit ec: ExecutionContext, reactiveMongoApi: 
 
   import JsonFormats._
 
-  def collection: Future[JSONCollection] = reactiveMongoApi.database.map(_.collection("todos"))
+  def todosCollection: Future[JSONCollection] = reactiveMongoApi.database.map(_.collection("todos"))
 
   def getAll: Future[Seq[Todo]] = {
     val query = Json.obj()
-    collection.flatMap(_.find(query)
+    todosCollection.flatMap(_.find(query)
       .cursor[Todo](ReadPreference.primary)
       .collect[Seq]()
     )
@@ -40,26 +40,30 @@ class TodoRepository @Inject()(implicit ec: ExecutionContext, reactiveMongoApi: 
 
   def getTodo(id: BSONObjectID): Future[Option[Todo]] = {
     val query = BSONDocument("_id" -> id)
-    collection.flatMap(_.find(query).one[Todo])
+    todosCollection.flatMap(_.find(query).one[Todo])
   }
 
   def addTodo(todo: Todo): Future[WriteResult] = {
-    collection.flatMap(_.insert(todo))
+    todosCollection.flatMap(_.insert(todo))
   }
 
-  def updateTodo(id: BSONObjectID, todo: Todo): Future[UpdateWriteResult] = {
+  def updateTodo(id: BSONObjectID, todo: Todo): Future[Option[Todo]] = {
+
     val selector = BSONDocument("_id" -> id)
-    val modifier = BSONDocument(
+    val updateModifier = BSONDocument(
       "$set" -> BSONDocument(
         "title" -> todo.title,
-        "completed" -> todo.completed))
+        "completed" -> todo.completed)
+    )
 
-    collection.flatMap(_.update(selector, modifier))
+    todosCollection.flatMap(
+      _.findAndUpdate(selector, updateModifier, fetchNewObject = true).map(_.result[Todo])
+    )
   }
 
-  def deleteTodo(id: BSONObjectID): Future[WriteResult] = {
+  def deleteTodo(id: BSONObjectID): Future[Option[Todo]] = {
     val selector = BSONDocument("_id" -> id)
-    collection.flatMap(_.remove(selector))
+    todosCollection.flatMap(_.findAndRemove(selector).map(_.result[Todo]))
   }
 
 }
