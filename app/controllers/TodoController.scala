@@ -48,7 +48,8 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
 
   @ApiOperation(
     value = "Add a new Todo to the list",
-    response = classOf[Void]
+    response = classOf[Void],
+    code = 201
   )
   @ApiResponses(Array(
       new ApiResponse(code = 400, message = "Invalid Todo format")
