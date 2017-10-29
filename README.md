@@ -11,7 +11,7 @@ A simple TODO app built with <a href="https://www.playframework.com/">play<a/>, 
 
 ### How to run the app
 You need
-* MongoDB Installed and running on your machine with a database ```example```. Tutorial [here](https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-ubuntu/)
+* MongoDB Installed and running on your machine. Tutorial [here](https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-ubuntu/)
 * SBT (mandatory if you don't want to use an IDE)
 * IntelliJ to import the project (optional)
 * SBT plugin (optional)
