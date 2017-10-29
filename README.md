@@ -1,5 +1,13 @@
-# Play Framework 2.6.x with Swagger and ReactiveMongo
-A simple TODO app built with [Play Framework 2.6](https://www.playframework.com/) [Swagger](https://github.com/swagger-api/swagger-play/tree/master/play-2.6/swagger-play2) and [ReactiveMongo](http://reactivemongo.org/)
+<h1 align="center">
+  <img src="https://raw.githubusercontent.com/ricsirigu/play26-swagger-reactivemongo/master/docs/logo.png" alt="logo">
+   <br>
+    Play Framework 2.6.x with Swagger and ReactiveMongo  
+   <br>
+  <h4 align="center">
+A simple TODO app built with <a href="https://www.playframework.com/">play<a/>, <a href="https://github.com/swagger-api/swagger-play/tree/master/play-2.6/swagger-play">swagger<a/> and <a href="http://reactivemongo.org/">ReactiveMongo<a/>
+  </h4>
+</h1>
+
 
 ### How to run
 You need
