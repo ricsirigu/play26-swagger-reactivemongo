@@ -5,7 +5,7 @@ import javax.inject.Inject
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.ReadPreference
-import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
+import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
