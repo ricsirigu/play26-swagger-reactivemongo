@@ -9,7 +9,7 @@ A simple TODO app built with <a href="https://www.playframework.com/">play<a/>, 
 </h1>
 
 
-### How to run
+### How to run the app
 You need
 * MongoDB Installed and running on your machine with a database ```example```. Tutorial [here](https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-ubuntu/)
 * SBT (mandatory if you don't want to use an IDE)
@@ -18,13 +18,17 @@ You need
 
 Tho ways to run the project:
 * Import the project, run SBT and type ```run```  to launch the server.
-* cd into the project directory, run SBT and type ```run```  to launch the server.
+* cd into the project directory, run SBT and type ```run```  to launch the server or type ```sbt run```.
 
 Then open your favourite browser and go to
 
 ```localhost:9000/api-docs```
 
 From the beautiful Swagger-UI interface you can perform all the CRUD operations you want
+
+### How to run the tests
+In the tests directory there are tests written with the [ScalaTest](http://www.scalatest.org/) library.  
+To launch them just type ```test``` in a running SBT session or simply type ```sbt test```
 
 Enjoy.
 
