@@ -6,6 +6,7 @@
   <h4 align="center">
 A simple TODO app built with <a href="https://www.playframework.com/">play<a/>, <a href="https://github.com/swagger-api/swagger-play/tree/master/play-2.6/swagger-play">swagger<a/> and <a href="http://reactivemongo.org/">ReactiveMongo<a/>
   </h4>
+    <img src="https://travis-ci.org/ricsirigu/play26-swagger-reactivemongo.svg?branch=master" alt="travis build">
 </h1>
 
 
