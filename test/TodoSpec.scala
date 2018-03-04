@@ -19,12 +19,12 @@ class TodoIntegrationSpec extends PlayWithMongoSpec with BeforeAndAfter {
     await {
       todos = reactiveMongoApi.database.map(_.collection("todos"))
 
-      todos.flatMap(_.bulkInsert(ordered = false)(
+      todos.flatMap(_.insert[Todo](ordered = false).many(List(
         Todo(_id = None, title = "Test todo 1", completed = Some(false)),
         Todo(_id = None, title = "Test todo 2", completed = Some(true)),
         Todo(_id = None, title = "Test todo 3", completed = Some(false)),
         Todo(_id = None, title = "Test todo 4", completed = Some(true))
-      ))
+      )))
     }
   }
 

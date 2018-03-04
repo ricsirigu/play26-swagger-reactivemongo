@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.api.ReadPreference
+import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.play.json._
@@ -34,7 +34,7 @@ class TodoRepository @Inject()(implicit ec: ExecutionContext, reactiveMongoApi: 
     val query = Json.obj()
     todosCollection.flatMap(_.find(query)
       .cursor[Todo](ReadPreference.primary)
-      .collect[Seq]()
+      .collect[Seq](100, Cursor.FailOnError[Seq[Todo]]())
     )
   }
 
