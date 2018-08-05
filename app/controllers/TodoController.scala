@@ -24,7 +24,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     responseContainer = "List"
   )
   def getAllTodos = Action.async {
-    todoRepo.getAll.map{ todos =>
+    todoRepo.getAll().map { todos =>
       Ok(Json.toJson(todos))
     }
   }
@@ -38,9 +38,9 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
       new ApiResponse(code = 404, message = "Todo not found")
     )
   )
-  def getTodo(@ApiParam(value = "The id of the Todo to fetch") todoId: BSONObjectID) = Action.async{ req =>
-    todoRepo.getTodo(todoId).map{ maybeTodo =>
-      maybeTodo.map{ todo =>
+  def getTodo(@ApiParam(value = "The id of the Todo to fetch") todoId: BSONObjectID) = Action.async {
+    todoRepo.getTodo(todoId).map { maybeTodo =>
+      maybeTodo.map { todo =>
         Ok(Json.toJson(todo))
       }.getOrElse(NotFound)
     }
@@ -59,9 +59,9 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
       new ApiImplicitParam(value = "The Todo to add, in Json Format", required = true, dataType = "models.Todo", paramType = "body")
     )
   )
-  def createTodo() = Action.async(parse.json){ req =>
-    req.body.validate[Todo].map{ todo =>
-      todoRepo.addTodo(todo).map{ _ =>
+  def createTodo() = Action.async(parse.json) {
+    _.body.validate[Todo].map { todo =>
+      todoRepo.addTodo(todo).map { _ =>
         Created
       }
     }.getOrElse(Future.successful(BadRequest("Invalid Todo format")))
@@ -81,10 +81,10 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
   )
   def updateTodo(@ApiParam(value = "The id of the Todo to update")
                  todoId: BSONObjectID) = Action.async(parse.json){ req =>
-    req.body.validate[Todo].map{ todo =>
+    req.body.validate[Todo].map { todo =>
       todoRepo.updateTodo(todoId, todo).map {
         case Some(todo) => Ok(Json.toJson(todo))
-        case None => NotFound
+        case _ => NotFound
       }
     }.getOrElse(Future.successful(BadRequest("Invalid Json")))
   }
@@ -93,11 +93,10 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     value = "Delete a Todo",
     response = classOf[Todo]
   )
-  def deleteTodo(@ApiParam(value = "The id of the Todo to delete") todoId: BSONObjectID) = Action.async{ req =>
+  def deleteTodo(@ApiParam(value = "The id of the Todo to delete") todoId: BSONObjectID) = Action.async { req =>
     todoRepo.deleteTodo(todoId).map {
       case Some(todo) => Ok(Json.toJson(todo))
-      case None => NotFound
+      case _ => NotFound
     }
   }
-
 }

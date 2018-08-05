@@ -1,14 +1,17 @@
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 import models.JsonFormats._
 import models.Todo
 import org.scalatest.BeforeAndAfter
-import play.api.libs.json.Json
+
+import play.api.libs.json.{ Json, JsObject }
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json.collection.JSONCollection
 import reactivemongo.play.json._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class TodoIntegrationSpec extends PlayWithMongoSpec with BeforeAndAfter {
 
@@ -49,7 +52,9 @@ class TodoIntegrationSpec extends PlayWithMongoSpec with BeforeAndAfter {
 
   "Delete a Todo"  in {
     val query = BSONDocument()
-    val Some(todoToDelete) = await(todos.flatMap(_.find(query).one[Todo]))
+    val Some(todoToDelete) = await(todos.flatMap(
+      _.find(query, Option.empty[JsObject]).one[Todo]))
+
     val todoIdToDelete = todoToDelete._id.get.stringify
     val Some(result) = route(app, FakeRequest(DELETE, s"/todos/$todoIdToDelete"))
     status(result) mustBe OK
@@ -60,7 +65,9 @@ class TodoIntegrationSpec extends PlayWithMongoSpec with BeforeAndAfter {
     val payload = Json.obj(
       "title" -> "Todo updated"
     )
-    val Some(todoToUpdate) = await(todos.flatMap(_.find(query).one[Todo]))
+    val Some(todoToUpdate) = await(todos.flatMap(
+      _.find(query, Option.empty[BSONDocument]).one[Todo]))
+
     val todoIdToUpdate = todoToUpdate._id.get.stringify
     val Some(result) = route(app, FakeRequest(PATCH, s"/todos/$todoIdToUpdate").withJsonBody(payload))
     val updatedTodo = contentAsJson(result).as[Todo]

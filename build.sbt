@@ -4,9 +4,9 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.6"
 
-val reactiveMongoVer = "0.13.0-play26"
+val reactiveMongoVer = "0.16.0-play26"
 
 libraryDependencies ++= Seq(
   guice,
