@@ -1,32 +1,35 @@
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-import models.JsonFormats._
 import models.Todo
 import org.scalatest.BeforeAndAfter
 
-import play.api.libs.json.{ Json, JsObject }
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-import reactivemongo.bson.BSONDocument
-import reactivemongo.play.json.collection.JSONCollection
-import reactivemongo.play.json._
+import reactivemongo.api.bson.BSONDocument
+import reactivemongo.api.bson.collection.BSONCollection
+import reactivemongo.play.json.compat.json2bson._
 
-class TodoIntegrationSpec extends PlayWithMongoSpec with BeforeAndAfter {
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-  var todos: Future[JSONCollection] = _
+final class TodoIntegrationSpec extends PlayWithMongoSpec with BeforeAndAfter {
+  var todos: Future[BSONCollection] = _
+
+  import java.util.UUID.{ randomUUID => genId }
 
   before {
     //Init DB
     await {
       todos = reactiveMongoApi.database.map(_.collection("todos"))
 
-      todos.flatMap(_.insert[Todo](ordered = false).many(List(
-        Todo(_id = None, title = "Test todo 1", completed = Some(false)),
-        Todo(_id = None, title = "Test todo 2", completed = Some(true)),
-        Todo(_id = None, title = "Test todo 3", completed = Some(false)),
-        Todo(_id = None, title = "Test todo 4", completed = Some(true))
+      todos.flatMap(_.insert(ordered = false).many(List(
+        Todo(_id = Some(genId()),
+          title = "Test todo 1", completed = Some(false)),
+        Todo(_id = Some(genId()),
+          title = "Test todo 2", completed = Some(true)),
+        Todo(_id = Some(genId()),
+          title = "Test todo 3", completed = Some(false)),
+        Todo(_id = Some(genId()), title = "Test todo 4", completed = Some(true))
       )))
     }
   }
@@ -40,23 +43,30 @@ class TodoIntegrationSpec extends PlayWithMongoSpec with BeforeAndAfter {
   "Get all Todos" in {
     val Some(result) = route(app, FakeRequest(GET, "/todos"))
     val resultList = contentAsJson(result).as[List[Todo]]
+
     resultList.length mustEqual 4
     status(result) mustBe OK
   }
 
   "Add a Todo" in {
-    val payload = Todo(_id = None, title = "Test newly added todo", completed = Some(true))
-    val Some(result) = route(app, FakeRequest(POST, "/todos").withJsonBody(Json.toJson(payload)))
+    val payload = Todo(
+      _id = Some(genId()),
+      title = "Test newly added todo",
+      completed = Some(true))
+
+    val Some(result) = route(
+      app, FakeRequest(POST, "/todos").withJsonBody(Json.toJson(payload)))
+
     status(result) mustBe CREATED
   }
 
   "Delete a Todo"  in {
     val query = BSONDocument()
-    val Some(todoToDelete) = await(todos.flatMap(
-      _.find(query, Option.empty[JsObject]).one[Todo]))
+    val Some(todoToDelete) = await(todos.flatMap(_.find(query).one[Todo]))
+    val todoIdToDelete = todoToDelete._id.mkString
+    val Some(result) = route(
+      app, FakeRequest(DELETE, s"/todos/$todoIdToDelete"))
 
-    val todoIdToDelete = todoToDelete._id.get.stringify
-    val Some(result) = route(app, FakeRequest(DELETE, s"/todos/$todoIdToDelete"))
     status(result) mustBe OK
   }
 
@@ -65,14 +75,14 @@ class TodoIntegrationSpec extends PlayWithMongoSpec with BeforeAndAfter {
     val payload = Json.obj(
       "title" -> "Todo updated"
     )
-    val Some(todoToUpdate) = await(todos.flatMap(
-      _.find(query, Option.empty[BSONDocument]).one[Todo]))
+    val Some(todoToUpdate) = await(todos.flatMap(_.find(query).one[Todo]))
+    val todoIdToUpdate = todoToUpdate._id.mkString
+    val Some(result) = route(
+      app, FakeRequest(PATCH, s"/todos/$todoIdToUpdate").withJsonBody(payload))
 
-    val todoIdToUpdate = todoToUpdate._id.get.stringify
-    val Some(result) = route(app, FakeRequest(PATCH, s"/todos/$todoIdToUpdate").withJsonBody(payload))
     val updatedTodo = contentAsJson(result).as[Todo]
+
     updatedTodo.title mustEqual "Todo updated"
     status(result) mustBe OK
   }
-
 }
