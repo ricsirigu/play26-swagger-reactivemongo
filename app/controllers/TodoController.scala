@@ -1,13 +1,15 @@
 package controllers
 
+import java.util.UUID
+
 import javax.inject.Inject
 
 import io.swagger.annotations._
-import models.JsonFormats._
+
 import models.{Todo, TodoRepository}
+
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
-import reactivemongo.bson.BSONObjectID
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,7 +18,9 @@ import scala.concurrent.Future
   * Created by Riccardo Sirigu on 10/08/2017.
   */
 @Api(value = "/todos")
-class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepository) extends AbstractController(cc) {
+class TodoController @Inject()(
+  cc: ControllerComponents,
+  todoRepo: TodoRepository) extends AbstractController(cc) {
 
   @ApiOperation(
     value = "Find all Todos",
@@ -24,7 +28,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     responseContainer = "List"
   )
   def getAllTodos = Action.async {
-    todoRepo.getAll().map { todos =>
+    todoRepo.getAll.map{ todos =>
       Ok(Json.toJson(todos))
     }
   }
@@ -38,13 +42,14 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
       new ApiResponse(code = 404, message = "Todo not found")
     )
   )
-  def getTodo(@ApiParam(value = "The id of the Todo to fetch") todoId: BSONObjectID) = Action.async {
-    todoRepo.getTodo(todoId).map { maybeTodo =>
-      maybeTodo.map { todo =>
-        Ok(Json.toJson(todo))
-      }.getOrElse(NotFound)
+  def getTodo(@ApiParam(value = "The id of the Todo to fetch") todoId: UUID) =
+    Action.async { req =>
+      todoRepo.getTodo(todoId).map{ maybeTodo =>
+        maybeTodo.map { todo =>
+          Ok(Json.toJson(todo))
+        }.getOrElse(NotFound)
+      }
     }
-  }
 
   @ApiOperation(
     value = "Add a new Todo to the list",
@@ -80,7 +85,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     )
   )
   def updateTodo(@ApiParam(value = "The id of the Todo to update")
-                 todoId: BSONObjectID) = Action.async(parse.json){ req =>
+                 todoId: UUID) = Action.async(parse.json) { req =>
     req.body.validate[Todo].map { todo =>
       todoRepo.updateTodo(todoId, todo).map {
         case Some(todo) => Ok(Json.toJson(todo))
@@ -93,7 +98,7 @@ class TodoController @Inject()(cc: ControllerComponents, todoRepo: TodoRepositor
     value = "Delete a Todo",
     response = classOf[Todo]
   )
-  def deleteTodo(@ApiParam(value = "The id of the Todo to delete") todoId: BSONObjectID) = Action.async { req =>
+  def deleteTodo(@ApiParam(value = "The id of the Todo to delete") todoId: UUID) = Action.async { req =>
     todoRepo.deleteTodo(todoId).map {
       case Some(todo) => Ok(Json.toJson(todo))
       case _ => NotFound

@@ -3,13 +3,13 @@
 # ~~~~
 
 GET       /todos                      controllers.TodoController.getAllTodos
-GET       /todos/:id                  controllers.TodoController.getTodo(id: reactivemongo.bson.BSONObjectID)
+GET       /todos/:id                  controllers.TodoController.getTodo(id: java.util.UUID)
 + nocsrf
 POST      /todos                      controllers.TodoController.createTodo
 + nocsrf
-PATCH     /todos/:id                  controllers.TodoController.updateTodo(id: reactivemongo.bson.BSONObjectID)
+PATCH     /todos/:id                  controllers.TodoController.updateTodo(id: java.util.UUID)
 + nocsrf
-DELETE    /todos/:id                  controllers.TodoController.deleteTodo(id: reactivemongo.bson.BSONObjectID)
+DELETE    /todos/:id                  controllers.TodoController.deleteTodo(id: java.util.UUID)
 
 # Swagger docs
 GET       /                           controllers.ApiDocsController.redirectToDocs

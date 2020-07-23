@@ -2,71 +2,70 @@ package models
 
 import javax.inject.Inject
 
-import scala.concurrent.{ ExecutionContext, Future }
+import java.util.UUID
 
-import play.api.libs.json.{ Json, JsObject }
+import scala.concurrent.{ExecutionContext, Future}
 
-import reactivemongo.bson.{ BSONDocument, BSONObjectID }
+import play.api.libs.json.Json
+import play.modules.reactivemongo.ReactiveMongoApi
 
-import reactivemongo.api.{ Cursor, ReadPreference }
+import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.api.commands.WriteResult
 
-import reactivemongo.play.json._
-import reactivemongo.play.json.collection.JSONCollection
-
-import play.modules.reactivemongo.ReactiveMongoApi
+import reactivemongo.api.bson.BSONDocument
+import reactivemongo.api.bson.collection.BSONCollection
 
 /**
  * Created by Riccardo Sirigu on 10/08/2017.
  */
-case class Todo(_id: Option[BSONObjectID], title: String, completed: Option[Boolean])
+case class Todo(
+  _id: Option[UUID], // Avoid using BSONObjectID, not to couple model with DB
+  title: String,
+  completed: Option[Boolean])
 
-object JsonFormats{
+object Todo {
   import play.api.libs.json._
 
   implicit val todoFormat: OFormat[Todo] = Json.format[Todo]
 }
 
-class TodoRepository @Inject()(implicit ec: ExecutionContext, reactiveMongoApi: ReactiveMongoApi){
+class TodoRepository @Inject()(
+  implicit ec: ExecutionContext,
+  reactiveMongoApi: ReactiveMongoApi) {
 
-  import JsonFormats._
+  import reactivemongo.play.json.compat,
+    compat.jsObjectWrites,
+    compat.json2bson._
 
-  def todosCollection: Future[JSONCollection] = reactiveMongoApi.database.map(_.collection("todos"))
+  private def todosCollection: Future[BSONCollection] =
+    reactiveMongoApi.database.map(_.collection("todos"))
 
-  def getAll(limit: Int = 100): Future[Seq[Todo]] =
-    todosCollection.flatMap(_.find(
-      selector = Json.obj(/* Using Play JSON */),
-      projection = Option.empty[JsObject])
-      .cursor[Todo](ReadPreference.primary)
-      .collect[Seq](limit, Cursor.FailOnError[Seq[Todo]]())
-    )
+  def getAll: Future[Seq[Todo]] =
+    todosCollection.flatMap(_.find(BSONDocument.empty).
+      cursor[Todo]().collect[Seq](100))
 
-  def getTodo(id: BSONObjectID): Future[Option[Todo]] =
-    todosCollection.flatMap(_.find(
-      selector = BSONDocument("_id" -> id),
-      projection = Option.empty[BSONDocument])
-      .one[Todo])
+  def getTodo(id: UUID): Future[Option[Todo]] =
+    todosCollection.flatMap(_.find(BSONDocument("_id" -> id)).one[Todo])
 
   def addTodo(todo: Todo): Future[WriteResult] =
-    todosCollection.flatMap(_.insert(todo))
+    todosCollection.flatMap(_.insert.one(
+      todo.copy(_id = Some(UUID.randomUUID()))))
 
-  def updateTodo(id: BSONObjectID, todo: Todo): Future[Option[Todo]] = {
-    val selector = BSONDocument("_id" -> id)
+  def updateTodo(id: UUID, todo: Todo): Future[Option[Todo]] = {
     val updateModifier = BSONDocument(
       f"$$set" -> BSONDocument(
         "title" -> todo.title,
         "completed" -> todo.completed)
     )
 
-    todosCollection.flatMap(
-      _.findAndUpdate(selector, updateModifier, fetchNewObject = true)
-        .map(_.result[Todo])
+    todosCollection.flatMap(_.findAndUpdate(
+      selector = BSONDocument("_id" -> id),
+      update = updateModifier,
+      fetchNewObject = true).map(_.result[Todo])
     )
   }
 
-  def deleteTodo(id: BSONObjectID): Future[Option[Todo]] = {
-    val selector = BSONDocument("_id" -> id)
-    todosCollection.flatMap(_.findAndRemove(selector).map(_.result[Todo]))
-  }
-
+  def deleteTodo(id: UUID): Future[Option[Todo]] =
+    todosCollection.flatMap(_.findAndRemove(
+      selector = BSONDocument("_id" -> id)).map(_.result[Todo]))
 }
